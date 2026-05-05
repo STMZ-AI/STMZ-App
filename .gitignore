@@ -1,0 +1,81 @@
+# Dependencies
+node_modules/
+jspm_packages/
+.npm
+.eslintcache
+
+# Build & Release Outputs
+dist/
+dist-electron/
+release/
+out/
+build/
+*.exe
+*.dmg
+*.AppImage
+*.deb
+*.rpm
+bin/
+obj/
+
+# Python Core
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.venv/
+venv/
+env/
+ENV/
+.eggs/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Environment & Secrets
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.env*
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Editor & OS Files
+.vscode/*
+!.vscode/extensions.json
+!.vscode/launch.json
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Project Specific (Audio & XML)
+*.mp3
+*.wav
+*.flac
+*.m4a
+*.aiff
+*.ogg
+!public/**/*.mp3
+!public/**/*.wav
+rekordbox_stems.xml
+test_rekordbox.xml
+impulse_decoded.wav
+
+# Local Dev
+temp/
+tmp/
