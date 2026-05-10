@@ -20,7 +20,7 @@ export default defineConfig({
               fileName: () => 'main.cjs',
             },
             rollupOptions: {
-              external: ['electron', 'child_process', 'path', 'url', 'fs'],
+              external: ['electron', 'child_process', 'path', 'url', 'fs', 'http', 'https', 'stream', 'stream/promises'],
             },
           },
         },

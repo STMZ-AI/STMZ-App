@@ -6,12 +6,15 @@ import ProcessingOptions from './components/ProcessingOptions';
 import ProgressView from './components/ProgressView';
 import ImportGuideModal from './components/ImportGuideModal';
 import LogPanel from './components/LogPanel';
+import SetupView from './components/SetupView';
 
 // Check if running inside Electron
 const isElectron = !!(window.electronAPI);
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('import'); // 'import' | 'rekordbox'
+  const [setupDone, setSetupDone] = useState(!isElectron); // Default to ready if not in electron (dev)
+  const [missingDeps, setMissingDeps] = useState(null);
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [selectedTrackIds, setSelectedTrackIds] = useState([]);
   const [rekordboxXml, setRekordboxXml] = useState(null);
@@ -35,6 +38,22 @@ export default function App() {
   const [completionData, setCompletionData] = useState(null);
   const [showGuide, setShowGuide] = useState(false);
   const [logs, setLogs] = useState([]);
+
+  // Check dependencies on startup
+  useEffect(() => {
+    if (!isElectron) return;
+    
+    const checkDeps = async () => {
+      const deps = await window.electronAPI.checkDependencies();
+      setMissingDeps(deps);
+      // App is ready if engine + ffmpeg are installed (models can be lazy)
+      if (deps.engine && deps.ffmpeg) {
+        setSetupDone(true);
+      }
+    };
+    
+    checkDeps();
+  }, []);
 
   // Persist settings
   useEffect(() => {
@@ -156,6 +175,8 @@ export default function App() {
 
   return (
     <div style={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
+      {!setupDone && missingDeps && <SetupView onComplete={() => setSetupDone(true)} missingDeps={missingDeps} />}
+      
       <TitleBar />
 
       {/* Tab Bar */}

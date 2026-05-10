@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "description": "STMZ AI - Stem Splitter for Rekordbox DJs",
+  "author": "STMZ-AI",
   "type": "module",
   "main": "dist-electron/main.cjs",
   "scripts": {
@@ -25,7 +26,7 @@
     ],
     "extraResources": [
       {
-        "from": "engine",
+        "from": "dist-engine/main",
         "to": "engine"
       },
       {
@@ -35,12 +36,14 @@
     ],
     "asar": true,
     "win": {
-      "target": ["dir", "nsis"],
-      "icon": "public/icon.png"
+      "target": ["nsis"],
+      "icon": "public/icon.png",
+      "requestedExecutionLevel": "asInvoker"
     },
     "nsis": {
       "oneClick": false,
-      "allowToChangeInstallationDirectory": true
+      "allowToChangeInstallationDirectory": true,
+      "include": "build/installer.nsh"
     }
   },
   "dependencies": {

@@ -250,8 +250,62 @@ def handle_process(data: dict):
     })
 
 
+def handle_download_models(data: dict):
+    """Pre-download required AI models with progress reporting."""
+    import re
+    from separator import HTDEMUCS_MODEL
+
+    class ProgressCapture:
+        """Intercepts stderr to parse tqdm progress from torch.hub downloads."""
+        def __init__(self, original):
+            self.original = original
+
+        def write(self, s):
+            self.original.write(s)
+            # Match tqdm patterns like: " 45%|████      | 1.12G/2.49G"
+            m = re.search(r'(\d+)%\|.*?\|\s*([\d.]+\w+)/([\d.]+\w+)', s)
+            if m:
+                send({
+                    "type": "download_progress",
+                    "percent": int(m.group(1)),
+                    "downloaded": m.group(2),
+                    "total": m.group(3),
+                })
+            # Also match simpler patterns: "Downloading: 45%"
+            elif 'ownload' in s:
+                m2 = re.search(r'(\d+)%', s)
+                if m2:
+                    send({
+                        "type": "download_progress",
+                        "percent": int(m2.group(1)),
+                    })
+
+        def flush(self):
+            self.original.flush()
+
+    old_stderr = sys.stderr
+    sys.stderr = ProgressCapture(old_stderr)
+    try:
+        send({"type": "log", "message": f"Starting download for model: {HTDEMUCS_MODEL}..."})
+        separator = StemSeparator()
+        separator.download_model(HTDEMUCS_MODEL)
+        send({"type": "download_complete", "model": HTDEMUCS_MODEL})
+    except Exception as e:
+        send({"type": "error", "message": f"Failed to download models: {traceback.format_exc()}"})
+    finally:
+        sys.stderr = old_stderr
+
+
 def main():
     """Main IPC loop: read JSON commands from stdin, dispatch handlers."""
+    # Check for FFmpeg in PATH
+    import shutil
+    ffmpeg_path = shutil.which("ffmpeg")
+    if ffmpeg_path:
+        send({"type": "log", "message": f"FFmpeg found at: {ffmpeg_path}"})
+    else:
+        send({"type": "log", "message": "WARNING: FFmpeg not found in PATH. Audio processing may fail."})
+
     send({"type": "ready", "message": "STMZ AI Engine ready."})
 
     for line in sys.stdin:
@@ -278,6 +332,8 @@ def main():
                 handle_get_cover_art(data)
             elif cmd == "process":
                 handle_process(data)
+            elif cmd == "download_models":
+                handle_download_models(data)
             elif cmd == "quit":
                 send({"type": "log", "message": "Engine shutting down."})
                 break

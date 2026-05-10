@@ -72,6 +72,13 @@ class StemSeparator:
         self._model_name = model_name
         return model
 
+    def download_model(self, model_name: str):
+        """Pre-download a Demucs model."""
+        self._log(f"Starting download for model: {model_name}...")
+        # get_model triggers the download if not present
+        get_model(model_name)
+        self._log(f"Model {model_name} downloaded and ready.")
+
     # ── Core separation ─────────────────────────────────────────────────────
 
     def separate(

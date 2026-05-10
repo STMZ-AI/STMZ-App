@@ -79,3 +79,9 @@ impulse_decoded.wav
 # Local Dev
 temp/
 tmp/
+
+# Engine Builds & Models
+build-engine/
+dist-engine/
+models/
+*.spec

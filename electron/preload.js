@@ -13,6 +13,15 @@ contextBridge.exposeInMainWorld('electronAPI', {
   selectOutputFolder: () => ipcRenderer.invoke('select-output-folder'),
   getDroppedFiles: (paths) => ipcRenderer.invoke('get-dropped-files', paths),
 
+  // Dependency management (replaces old checkModels)
+  checkDependencies: () => ipcRenderer.invoke('check-dependencies'),
+  downloadDependency: (name) => ipcRenderer.invoke('download-dependency', name),
+  onSetupProgress: (callback) => {
+    const handler = (_event, data) => callback(data);
+    ipcRenderer.on('setup-progress', handler);
+    return () => ipcRenderer.removeListener('setup-progress', handler);
+  },
+
   // Engine communication
   sendToEngine: (command) => ipcRenderer.invoke('engine-send', command),
   cancelEngine: () => ipcRenderer.invoke('engine-cancel'),
